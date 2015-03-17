@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BirthdayView">
+        <attr name="imageResourceId" format="reference" />
+        <attr name="dividerWidth" format="dimension" />
+        <attr name="dividerColor" format="color" />
+        <attr name="innerPadding" format="dimension" />
+        <attr name="titleText" format="string" />
+        <attr name="textColor" format="color" />
+        <attr name="textSize" format="dimension" />
+    </declare-styleable>
+</resources>
