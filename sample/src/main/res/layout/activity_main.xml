@@ -6,13 +6,15 @@
     tools:context=".MainActivity">
 
     <com.eftimoff.birthdayview.BirthdayView
-        birthdayview:imageResourceId="@drawable/ic_launcher"
-        birthdayview:dividerWidth="1dp"
+        birthdayview:imageResourceId="@android:drawable/sym_call_missed"
+        birthdayview:dividerMargin="20dp"
+        birthdayview:dividerColor="@android:color/darker_gray"
+        birthdayview:titleText="Click here"
+        birthdayview:textColor="@android:color/darker_gray"
+        android:id="@+id/birthdayView"
         android:background="@android:color/white"
-        birthdayview:dividerColor="@android:color/holo_green_dark"
-        birthdayview:innerPadding="20dp"
-        birthdayview:titleText="Hello what is going on here"
         android:layout_width="match_parent"
-        android:layout_height="64dp" />
+        android:padding="10dp"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

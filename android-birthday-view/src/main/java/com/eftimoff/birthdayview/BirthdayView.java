@@ -7,39 +7,32 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Build;
-import android.text.InputFilter;
-import android.text.InputType;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.eftimoff.birthdayview.utils.Utils;
+import com.eftimoff.birthdayview.exceptions.BirthdayViewError;
+import com.eftimoff.birthdayview.listeners.EventListener;
+import com.eftimoff.birthdayview.utils.ConditionUtils;
 import com.eftimoff.mylibrary.R;
 
 public class BirthdayView extends LinearLayout {
 
-    public static final String DEBUG_TAG = BirthdayView.class.getSimpleName();
-
-    public static final int PADDING_SIZE = 10;
-    public static final int IMAGE_SIZE = 20;
-    public static final String DATE = "Date";
-    public static final String MONTH = "Month";
-    public static final String YEAR = "Year";
     public static final int ANIMATION_DURATION = 400;
 
     private ImageView imageView;
     private View divider;
-    private TextView firstTitle;
+    private TextView title;
 
-    private OnClickListener onClickListener;
+    private EventListener eventListener;
 
-    private EditText date;
+    private EditText day;
     private EditText month;
     private EditText year;
     private View firstDivider;
@@ -72,64 +65,154 @@ public class BirthdayView extends LinearLayout {
 
     private void init() {
         setWillNotDraw(true);
-        onClickListener = new OnBirthdayClickListener();
-        setOnClickListener(onClickListener);
+        setOnClickListener(new OnBirthdayClickListener());
 
-        imageView = new ImageView(getContext());
-        imageView.setLayoutParams(getImageViewParams());
-        imageView.setAdjustViewBounds(true);
-        addView(imageView);
+        final View view = LayoutInflater.from(getContext()).inflate(R.layout.view_birthday, this, true);
 
-        divider = new View(getContext());
-        addView(divider);
+        imageView = (ImageView) view.findViewById(R.id.image);
 
-        firstTitle = new TextView(getContext());
-        final LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        layoutParams.gravity = Gravity.CENTER_VERTICAL;
-        firstTitle.setLayoutParams(layoutParams);
-        firstTitle.setGravity(Gravity.CENTER_VERTICAL);
-        addView(firstTitle);
+        divider = view.findViewById(R.id.divider);
 
-        date = getEditText(2);
-        date.setHint(DATE);
-        date.setVisibility(GONE);
-        addView(date);
+        title = (TextView) view.findViewById(R.id.title);
 
-        firstDivider = new View(getContext());
-        firstDivider.setVisibility(GONE);
-        addView(firstDivider);
+        day = (EditText) view.findViewById(R.id.day);
+        day.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
-        month = getEditText(2);
-        month.setHint(MONTH);
-        month.setVisibility(GONE);
-        addView(month);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
-        secondDivider = new View(getContext());
-        secondDivider.setVisibility(GONE);
-        addView(secondDivider);
+            @Override
+            public void afterTextChanged(Editable s) {
+                final int length = s.length();
+                if (length < 0 || length > 2) {
+                    return;
+                }
+                try {
+                    final int day = Integer.valueOf(s.toString());
+                    if (eventListener != null) {
+                        eventListener.onDayEntered(day);
+                    }
+                    ConditionUtils.checkDay(day);
+                    checkIfIsFinished();
+                } catch (NumberFormatException e) {
+                    if (eventListener != null) {
+                        eventListener.onError(new BirthdayViewError(e, BirthdayViewError.Type.NUMBER));
+                    }
+                } catch (IllegalArgumentException e) {
+                    if (eventListener != null) {
+                        eventListener.onError(new BirthdayViewError(e, BirthdayViewError.Type.ILLEGAL));
+                    }
+                }
 
-        year = getEditText(4);
-        year.setHint(YEAR);
-        year.setVisibility(GONE);
-        addView(year);
+            }
+        });
+
+        firstDivider = view.findViewById(R.id.firstDivider);
+
+        month = (EditText) view.findViewById(R.id.month);
+        month.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                final int length = s.length();
+                if (length < 0 || length > 2) {
+                    return;
+                }
+                try {
+                    final int month = Integer.valueOf(s.toString());
+                    if (eventListener != null) {
+                        eventListener.onMonthEntered(month);
+                    }
+                    ConditionUtils.checkMonth(month);
+                    checkIfIsFinished();
+                } catch (NumberFormatException e) {
+                    if (eventListener != null) {
+                        eventListener.onError(new BirthdayViewError(e, BirthdayViewError.Type.NUMBER));
+                    }
+                } catch (IllegalArgumentException e) {
+                    if (eventListener != null) {
+                        eventListener.onError(new BirthdayViewError(e, BirthdayViewError.Type.ILLEGAL));
+                    }
+                }
+            }
+        });
+
+        secondDivider = view.findViewById(R.id.secondtDivider);
+
+        year = (EditText) view.findViewById(R.id.year);
+        year.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                final int length = s.length();
+                if (length == 4) {
+                    try {
+                        final int year = Integer.valueOf(s.toString());
+                        if (eventListener != null) {
+                            eventListener.onYearEntered(year);
+                        }
+                        ConditionUtils.checkYear(year);
+                        checkIfIsFinished();
+                    } catch (NumberFormatException e) {
+                        if (eventListener != null) {
+                            eventListener.onError(new BirthdayViewError(e, BirthdayViewError.Type.NUMBER));
+                        }
+                    } catch (IllegalArgumentException e) {
+                        if (eventListener != null) {
+                            eventListener.onError(new BirthdayViewError(e, BirthdayViewError.Type.ILLEGAL));
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void checkIfIsFinished() throws NumberFormatException {
+        final int dayLength = day.length();
+        if (dayLength != 2) {
+            return;
+        }
+        final int monthLength = month.length();
+        if (monthLength != 2) {
+            return;
+        }
+        final int yearLength = year.length();
+        if (yearLength != 4) {
+            return;
+        }
+        try {
+            final int dayValue = Integer.valueOf(day.getText().toString());
+            final int monthValue = Integer.valueOf(month.getText().toString());
+            final int yearValue = Integer.valueOf(year.getText().toString());
+            if (eventListener != null) {
+                eventListener.onFinish(dayValue, monthValue, yearValue);
+            }
+        } catch (NumberFormatException e) {
+            if (eventListener != null) {
+                eventListener.onError(new BirthdayViewError(e, BirthdayViewError.Type.NUMBER));
+            }
+        }
 
     }
 
-    private EditText getEditText(final int maxNumbers) {
-        final EditText editText = new EditText(getContext());
-        final LayoutParams editTextParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        editTextParams.weight = 1;
-        editTextParams.gravity = Gravity.CENTER_VERTICAL;
-        editText.setLayoutParams(editTextParams);
-        editText.setSingleLine();
-        editText.setGravity(Gravity.CENTER);
-        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-        editText.setBackgroundColor(Color.TRANSPARENT);
-        final InputFilter[] inputFilters = new InputFilter[1];
-        inputFilters[0] = new InputFilter.LengthFilter(maxNumbers);
-        editText.setFilters(inputFilters);
-        return editText;
-    }
 
     /**
      * Get all the fields from the attributes .
@@ -142,9 +225,8 @@ public class BirthdayView extends LinearLayout {
         try {
             if (a != null) {
                 setImageResourceId(a.getResourceId(R.styleable.BirthdayView_imageResourceId, android.R.drawable.arrow_down_float));
-                setDividerWidth(a.getDimensionPixelSize(R.styleable.BirthdayView_dividerWidth, 1));
+                setDividerMargin(a.getDimensionPixelSize(R.styleable.BirthdayView_dividerMargin, 10));
                 setDividerColor(a.getColor(R.styleable.BirthdayView_dividerColor, Color.BLACK));
-                setInnerPadding(a.getDimensionPixelSize(R.styleable.BirthdayView_innerPadding, 5));
                 setTitleText(a.getString(R.styleable.BirthdayView_titleText));
                 setTextColor(a.getColor(R.styleable.BirthdayView_textColor, Color.BLUE));
                 setTextSize(a.getDimensionPixelSize(R.styleable.BirthdayView_textSize, 20));
@@ -156,12 +238,17 @@ public class BirthdayView extends LinearLayout {
         }
     }
 
-    private LayoutParams getImageViewParams() {
-        final int pixels = Utils.convertDpToPixel(getContext(), IMAGE_SIZE);
-        final LayoutParams layoutParams = new LayoutParams(pixels, pixels);
-        layoutParams.gravity = Gravity.CENTER_VERTICAL;
-        return layoutParams;
+    private void setDividerMargin(final int dimensionPixelSize) {
+        final LayoutParams dividerLayoutParams = (LayoutParams) divider.getLayoutParams();
+        dividerLayoutParams.setMargins(dimensionPixelSize, 0, dimensionPixelSize, 0);
+        final int paddingLeft = getPaddingLeft();
+        final int paddingTop = getPaddingTop();
+        final int paddingRight = getPaddingRight();
+        final int paddingBottom = getPaddingBottom();
+        final int max = Math.max(paddingLeft, dimensionPixelSize);
+        setPadding(max, paddingTop, paddingRight, paddingBottom);
     }
+
 
     private void animateFade(final View view) {
         view.animate()
@@ -187,17 +274,6 @@ public class BirthdayView extends LinearLayout {
                 .setListener(null);
     }
 
-    public void setDividerWidth(final int dividerWidth) {
-        final LayoutParams params = new LayoutParams(dividerWidth, LayoutParams.MATCH_PARENT);
-        params.gravity = Gravity.CENTER_VERTICAL;
-        divider.setLayoutParams(params);
-        final LayoutParams firstDividerParams = new LayoutParams(dividerWidth, LayoutParams.MATCH_PARENT);
-        firstDividerParams.gravity = Gravity.CENTER_VERTICAL;
-        firstDivider.setLayoutParams(firstDividerParams);
-        final LayoutParams secondDividerParams = new LayoutParams(dividerWidth, LayoutParams.MATCH_PARENT);
-        secondDividerParams.gravity = Gravity.CENTER_VERTICAL;
-        secondDivider.setLayoutParams(secondDividerParams);
-    }
 
     public void setImageResourceId(final int imageResourceId) {
         imageView.setImageResource(imageResourceId);
@@ -209,29 +285,27 @@ public class BirthdayView extends LinearLayout {
         secondDivider.setBackgroundColor(color);
     }
 
-    public void setInnerPadding(final int innerPadding) {
-        final int paddingPixels = Utils.convertDpToPixel(getContext(), PADDING_SIZE);
-        final int imagePadding = innerPadding < paddingPixels ? paddingPixels : innerPadding;
-        setPadding(imagePadding, paddingPixels, paddingPixels, paddingPixels);
-        ((LinearLayout.LayoutParams) divider.getLayoutParams()).setMargins(innerPadding, 0, innerPadding, 0);
-    }
-
     public void setTitleText(final String text) {
-        firstTitle.setText(text);
+        title.setText(text);
+        invalidate();
     }
 
     public void setTextColor(final int color) {
-        firstTitle.setTextColor(color);
-        date.setHintTextColor(color);
+        title.setTextColor(color);
+        day.setHintTextColor(color);
         month.setHintTextColor(color);
         year.setHintTextColor(color);
     }
 
     public void setTextSize(final float textSize) {
-        firstTitle.setTextSize(textSize);
-        date.setTextSize(textSize);
+        title.setTextSize(textSize);
+        day.setTextSize(textSize);
         month.setTextSize(textSize);
         year.setTextSize(textSize);
+    }
+
+    public void setEventListener(final EventListener eventListener) {
+        this.eventListener = eventListener;
     }
 
     private boolean isClicked() {
@@ -249,21 +323,19 @@ public class BirthdayView extends LinearLayout {
             if (isClicked()) {
                 return;
             }
-            Log.i(DEBUG_TAG, "EDIT_MODE");
-            makeVisibleButHidden(date);
+            makeVisibleButHidden(day);
             makeVisibleButHidden(firstDivider);
             makeVisibleButHidden(month);
             makeVisibleButHidden(secondDivider);
             makeVisibleButHidden(year);
-            animateShowing(date);
+            animateShowing(day);
             animateShowing(firstDivider);
             animateShowing(month);
             animateShowing(secondDivider);
             animateShowing(year);
-            animateFade(firstTitle);
+            animateFade(title);
             setIsClicked(true);
         }
     }
-
 
 }

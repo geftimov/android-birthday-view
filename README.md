@@ -1,7 +1,85 @@
-## android-empty-project
-This is empty project to start open source library.
+## android-birthday-view
 
-## Licence
+This is android view for entering birthday.
+
+#### Usage
+
+```java
+     <com.eftimoff.birthdayview.BirthdayView
+            birthdayview:imageResourceId="@android:drawable/sym_call_missed"
+            birthdayview:dividerMargin="20dp"
+            birthdayview:dividerColor="@android:color/darker_gray"
+            birthdayview:titleText="Click here"
+            birthdayview:textColor="@android:color/darker_gray"
+            android:id="@+id/birthdayView"
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:layout_height="wrap_content" />
+
+final BirthdayView birthdayView = (BirthdayView) findViewById(R.id.birthdayView);
+```
+
+#### Events
+You will probably want to know when the user entered day , month or year.
+This happens two ways:
+
+##### Listeners
+
+```java
+     <com.eftimoff.birthdayview.BirthdayView
+            birthdayview:imageResourceId="@android:drawable/sym_call_missed"
+            birthdayview:dividerMargin="20dp"
+            birthdayview:dividerColor="@android:color/darker_gray"
+            birthdayview:titleText="Click here"
+            birthdayview:textColor="@android:color/darker_gray"
+            android:id="@+id/birthdayView"
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:layout_height="wrap_content" />
+
+final BirthdayView birthdayView = (BirthdayView) findViewById(R.id.birthdayView);
+```
+
+##### Bus and events
+
+```java
+    final BirthdayView birthdayView = (BirthdayView) findViewById(R.id.birthdayView);
+    birthdayView.setEventListener(new BusEventListener(bus));
+
+    @Subscribe
+    public void birthdayDayEnteredEvent(BirthdayDayEnteredEvent event) {
+        final int day = event.getDay();
+        Log.i("BirthdayView", "Do something useful with day number : " + day);
+    }
+```
+
+Available events:
+
+1) BirthdayDayEnteredEvent
+2) BirthdayMonthEnteredEvent
+3) BirthdayYearEnteredEvent
+4) BirthdayFinishEvent
+5) BirthdayErrorEvent
+
+
+#### Download
+
+	dependencies {
+		compile 'com.eftimoff:android-birthday-view:1.0.0@aar'
+	}
+
+#### TODO
+
+    1. Make gif of the library.
+
+#### Contributors
+
+I want to update this library and make it better. So any help will be appreciated.
+Make and pull - request and we can discuss it.
+
+#### Licence
 
     Copyright 2015 Georgi Eftimov
 

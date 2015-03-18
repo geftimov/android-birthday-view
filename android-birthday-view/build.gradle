@@ -71,5 +71,5 @@ signing {
 //}
 
 dependencies {
-    
+    provided 'com.squareup:otto:1.3.6'
 }
