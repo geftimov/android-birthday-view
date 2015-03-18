@@ -71,11 +71,11 @@ birthdayView.setEventListener(new EventListener() {
 
 Available events:
 
-1) BirthdayDayEnteredEvent
-2) BirthdayMonthEnteredEvent
-3) BirthdayYearEnteredEvent
-4) BirthdayFinishEvent
-5) BirthdayErrorEvent
+* BirthdayDayEnteredEvent
+* BirthdayMonthEnteredEvent
+* BirthdayYearEnteredEvent
+* BirthdayFinishEvent
+* BirthdayErrorEvent
 
 
 #### Download
