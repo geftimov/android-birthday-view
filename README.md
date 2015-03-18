@@ -27,19 +27,33 @@ This happens two ways:
 ##### Listeners
 
 ```java
-     <com.eftimoff.birthdayview.BirthdayView
-            birthdayview:imageResourceId="@android:drawable/sym_call_missed"
-            birthdayview:dividerMargin="20dp"
-            birthdayview:dividerColor="@android:color/darker_gray"
-            birthdayview:titleText="Click here"
-            birthdayview:textColor="@android:color/darker_gray"
-            android:id="@+id/birthdayView"
-            android:background="@android:color/white"
-            android:layout_width="match_parent"
-            android:padding="10dp"
-            android:layout_height="wrap_content" />
-
 final BirthdayView birthdayView = (BirthdayView) findViewById(R.id.birthdayView);
+birthdayView.setEventListener(new EventListener() {
+            @Override
+            public void onDayEntered(int day) {
+
+            }
+
+            @Override
+            public void onMonthEntered(int month) {
+
+            }
+
+            @Override
+            public void onYearEntered(int year) {
+
+            }
+
+            @Override
+            public void onFinish(int day, int month, int year) {
+
+            }
+
+            @Override
+            public void onError(BirthdayViewError birthdayViewError) {
+
+            }
+        });
 ```
 
 ##### Bus and events
